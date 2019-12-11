@@ -8,4 +8,22 @@ editor_options:
   chunk_output_type: console
 ---
 
-Welcome to my research website.
+This site demonstrates how easy it is to get set up with `workflowr`.
+
+See [test_html_widgets](test_html_widgets.html) to see how easy it is to build complicated stuff.
+
+Workflowr is smart - it only rebuilds pages that have changed.
+
+
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-K602S3BH12"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-K602S3BH12');
+</script>
+
+

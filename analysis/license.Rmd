@@ -5,6 +5,8 @@ output:
     toc: false
 editor_options:
   chunk_output_type: console
+workflowr:
+  suppress_report: false
 ---
 
 What license are you using for your code? See [choosealicense.com][choose] for
