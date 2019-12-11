@@ -1,0 +1,169 @@
+---
+title: "test_html_widgets"
+author: "bryangwhiting"
+date: "2019-12-10"
+output: workflowr::wflow_html
+editor_options:
+  chunk_output_type: console
+---
+
+This page demos that anything you can do with RMarkdown you can do with `workflowr` and host online. (Not true for Blogdown, which has the dependency on Hugo and can often require a lot of workarounds to get things working.)
+
+## Ggplot
+
+```{r}
+library(ggplot2)
+g <- qplot(rnorm(100))
+```
+
+## Plotly
+Examples from here: https://plotly-r.com/client-side-linking.html
+```{r}
+library(plotly)
+# load the `txhousing` dataset
+data(txhousing, package = "ggplot2")
+
+# declare `city` as the SQL 'query by' column
+tx <- highlight_key(txhousing, ~city)
+
+# initiate a plotly object
+base <- plot_ly(tx, color = I("black")) %>% 
+  group_by(city)
+
+# create a time series of median house price
+time_series <- base %>%
+  group_by(city) %>%
+  add_lines(x = ~date, y = ~median)
+time_series
+```
+Testing Highlight abilities:
+```{r}
+highlight(
+  time_series, 
+  on = "plotly_click", 
+  selectize = TRUE, 
+  dynamic = TRUE, 
+  persistent = TRUE
+)
+```
+
+## Crosstalk
+
+```{r}
+dot_plot <- base %>%
+  summarise(miss = sum(is.na(median))) %>%
+  filter(miss > 0) %>%
+  add_markers(
+    x = ~miss, 
+    y = ~forcats::fct_reorder(city, miss), 
+    hoverinfo = "x+y"
+  ) %>%
+  layout(
+    xaxis = list(title = "Number of months missing"),
+    yaxis = list(title = "")
+  ) 
+
+subplot(dot_plot, time_series, widths = c(.2, .8), titleX = TRUE) %>%
+  layout(showlegend = FALSE) %>%
+  highlight(on = "plotly_selected", dynamic = TRUE, selectize = TRUE)
+```
+
+```{r}
+hist <- add_histogram(
+  base,
+  x = ~median, 
+  histnorm = "probability density"
+)
+subplot(time_series, hist, nrows = 2) %>%
+  layout(barmode = "overlay", showlegend = FALSE) %>%
+  highlight(
+    dynamic = TRUE, 
+    selectize = TRUE, 
+    selected = attrs_selected(opacity = 0.3)
+  )
+```
+
+## Hightlight with filter events
+```{r}
+library(crosstalk)
+
+# generally speaking, use a "unique" key for filter, 
+# especially when you have multiple filters!
+tx <- highlight_key(txhousing)
+gg <- ggplot(tx) + geom_line(aes(date, median, group = city))
+filter <- bscols(
+  filter_select("id", "Select a city", tx, ~city),
+  ggplotly(gg, dynamicTicks = TRUE),
+  widths = c(12, 12)
+)
+
+tx2 <- highlight_key(txhousing, ~city, "Select a city")
+gg <- ggplot(tx2) + geom_line(aes(date, median, group = city))
+select <- highlight(
+  ggplotly(gg, tooltip = "city"), 
+  selectize = TRUE, persistent = TRUE
+)
+
+bscols(filter, select)
+```
+
+
+```{r}
+library(crosstalk)
+tx <- highlight_key(txhousing)
+widgets <- bscols(
+  widths = c(12, 12, 12),
+  filter_select("city", "Cities", tx, ~city),
+  filter_slider("sales", "Sales", tx, ~sales),
+  filter_checkbox("year", "Years", tx, ~year, inline = TRUE)
+)
+bscols(
+  widths = c(4, 8), widgets, 
+  plot_ly(tx, x = ~date, y = ~median, showlegend = FALSE) %>% 
+    add_lines(color = ~city, colors = "black")
+)
+```
+
+## Leaflet
+```{r}
+library(leaflet)
+
+eqs <- highlight_key(quakes)
+stations <- filter_slider(
+  "station", "Number of Stations", 
+  eqs, ~stations
+)
+
+p <- plot_ly(eqs, x = ~depth, y = ~mag) %>% 
+  add_markers(alpha = 0.5) %>% 
+  highlight("plotly_selected")
+
+map <- leaflet(eqs) %>% 
+  addTiles() %>% 
+  addCircles()
+
+bscols(
+  widths = c(6, 6, 3), 
+  p, map, stations
+)
+```
+
+## Plotly demo
+```{r}
+demo("crosstalk-highlight-epl-2", package = "plotly")
+
+```
+
+```{r}
+demo("crosstalk-highlight-binned-target-a", package = "plotly")
+
+```
+
+
+## Datatable
+
+```{r}
+DT::datatable(mtcars)
+```
+
+
