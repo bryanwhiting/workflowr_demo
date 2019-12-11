@@ -28,3 +28,4 @@ wflow_open('analysis/test_html_widgets.Rmd')
 
 Add Google Analytics Measurement ID.
 1. Google Analytics > lower left corner > Admin > do a bunch of stuff until you create a new stream.
+2. Store in a header file: https://stackoverflow.com/a/43334558/2138773
