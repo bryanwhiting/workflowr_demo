@@ -1,7 +1,7 @@
-name: "workflowr_demo"
+name: workflowr_demo
 output_dir: ../docs
 navbar:
-  title: "workflowr_demo"
+  title: workflowr_demo
   left:
   - text: Home
     href: index.html
@@ -9,6 +9,10 @@ navbar:
     href: about.html
   - text: License
     href: license.html
+  right:
+  - icon: fa-github
+    text: Source code
+    href: https://github.com/bryanwhiting/workflowr_demo
 output:
   workflowr::wflow_html:
     toc: yes
